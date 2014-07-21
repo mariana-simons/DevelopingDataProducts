@@ -1,0 +1,83 @@
+---
+title       : Car's Explorer
+subtitle    : Shiny App - Developing Data Products Course Project
+author      : Mariana Simons
+job         : July 21, 2014
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : [bootstrap]            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+## Car's Explorer Essentials
+
+### *Research question* 
+
+The **Car's Explorer** Shiny application is created to help car's users to investigate the question: "Is an automatic or manual car transmission better for miles per gallon (mpg)?"
+
+### *Data set*
+
+To address this question the Shiny application uses the *mtcars* in  ``` library(datasets)```.
+
+### *Application setup*
+
+The **Car's Explorer** Shiny application has two parts:
+ - Part I: **Explore car's mpg** allows the user to explore mpg vs. transmission or weight.
+ - Part II: **Predict car's mpg** allows the user to predict mpg for user's choice of transmission and weight.
+
+--- .class #id 
+
+## Part I: Explore car's mpg (mpg ~ transmission)
+
+### **User's input:** transmission (via selectBox)  
+### **Shiny app's output:**  the box plot shown below
+
+```{r boxplot, fig.height=6, fig.align='center', echo = FALSE}
+library(datasets)
+data(mtcars)
+mtcars$am <- as.factor(mtcars$am)
+plot(mtcars$am, mtcars$mpg, xlab = "transmission (am = 0 - automatic, am = 1 - manual)",
+     ylab = "mpg", main = "Exploratory plot of mpg ~ transmission", col = "blue")
+```
+
+--- .class #id 
+
+## Part I: Explore car's mpg (mpg ~ weight)
+
+### **User's input:** weight (via selectBox)  
+### **Shiny app's output:**  the scatter plot shown below
+
+```{r scatterplot, fig.height=6, fig.align='center', echo = FALSE}
+library(datasets)
+data(mtcars)
+mtcars$am <- as.factor(mtcars$am)
+plot(mtcars$wt, mtcars$mpg, xlab = "weight (lb/1000)", ylab = "mpg", 
+     main = "Exploratory plot of mpg ~ weight", col = "blue", bg = "blue", pch = 19)
+```
+
+
+--- .class #id 
+
+## Part II: Predict car's mpg
+
+### **User's input:** Example: transmission = manual and weight = 1.8
+### **Shiny app's output:**  Linear regression model prediction + plot (blue arrow dashed line).
+*Predicted mpg for your input of transmission and weight is: 29.94*
+
+```{r fitplot, fig.height=6, fig.align='center', echo = FALSE}
+fit <- lm(mpg ~ wt + am  + am*wt, data = mtcars)
+transmission <- 1
+weight <- 1.8
+prediction <- coef(fit)[1] + coef(fit)[2]*weight + coef(fit)[3]*transmission + coef(fit)[4]*weight*transmission
+      
+plot(mtcars$wt,mtcars$mpg, pch=19, col=mtcars$am, xlab = "Weight (lb/1000)", ylab = "mpg")
+abline(fit$coeff[1], fit$coeff[2],lwd=3, col = "black")
+abline(fit$coeff[1] + fit$coeff[3], fit$coeff[2] + fit$coeff[4],lwd=3, col = "red")
+lines(c(weight, weight), c(10, prediction), col = "blue", lwd = 3, lty = "dashed")
+points(weight, prediction, col = "blue", pch = 25, bg = "blue", cex = 1.8)
+title(" Linear regression mpg ~ transmission + weight + transmission*weight")
+legend("topright", pch = 19, col = c("black","red"), legend = c("automatic transmission", "manual transmission"))
+```
+
